@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <script src="https://tapi.bale.ai/miniapp.js?3"></script>
-
     <title>ورود کارکنان آمال</title>
 
     <style>
@@ -19,7 +17,7 @@
 
         .box {
             max-width: 420px;
-            margin: auto;
+            margin: 20px auto;
             background: white;
             padding: 25px;
             border-radius: 16px;
@@ -28,7 +26,6 @@
 
         h2 {
             text-align: center;
-            margin-top: 0;
         }
 
         label {
@@ -53,11 +50,11 @@
             border: 0;
             border-radius: 9px;
             font-size: 16px;
-            cursor: pointer;
         }
 
-        #message {
-            margin-top: 18px;
+        #message,
+        #status {
+            margin-top: 15px;
             text-align: center;
             line-height: 1.8;
         }
@@ -70,6 +67,10 @@
 
     <h2>ورود کارکنان</h2>
 
+    <div id="status">
+        در حال اتصال به بله...
+    </div>
+
     <form id="loginForm">
 
         <label for="username">کد راهکاران</label>
@@ -78,8 +79,7 @@
             id="username"
             type="text"
             inputmode="numeric"
-            placeholder="RahkaranPartyID"
-            autocomplete="username"
+            placeholder="کد راهکاران"
             required
         >
 
@@ -89,7 +89,6 @@
             id="password"
             type="password"
             placeholder="رمز عبور"
-            autocomplete="current-password"
             required
         >
 
@@ -108,18 +107,48 @@
 
 const form = document.getElementById("loginForm");
 const message = document.getElementById("message");
+const statusElement = document.getElementById("status");
 
 
-if (window.Bale && window.Bale.WebApp) {
+function initializeBale() {
 
-    if (window.Bale.WebApp.ready) {
-        window.Bale.WebApp.ready();
-    }
+    if (
+        window.Bale &&
+        window.Bale.WebApp
+    ) {
 
-    if (window.Bale.WebApp.expand) {
-        window.Bale.WebApp.expand();
+        statusElement.textContent =
+            "ارتباط با بله برقرار شد.";
+
+        if (window.Bale.WebApp.ready) {
+            window.Bale.WebApp.ready();
+        }
+
+        if (window.Bale.WebApp.expand) {
+            window.Bale.WebApp.expand();
+        }
+
+    } else {
+
+        statusElement.textContent =
+            "این صفحه باید از داخل Mini App بله باز شود.";
     }
 }
+
+
+const baleScript = document.createElement("script");
+
+baleScript.src =
+    "https://tapi.bale.ai/miniapp.js?3";
+
+baleScript.onload = initializeBale;
+
+baleScript.onerror = function () {
+    statusElement.textContent =
+        "ارتباط با سرویس Mini App بله برقرار نشد.";
+};
+
+document.head.appendChild(baleScript);
 
 
 form.addEventListener("submit", function(event) {
@@ -127,58 +156,46 @@ form.addEventListener("submit", function(event) {
     event.preventDefault();
 
     const username =
-        document.getElementById("username").value.trim();
+        document.getElementById("username")
+            .value
+            .trim();
 
     const password =
-        document.getElementById("password").value;
-
+        document.getElementById("password")
+            .value;
 
     if (!/^[0-9]+$/.test(username)) {
-
         message.textContent =
             "کد راهکاران معتبر نیست.";
-
         return;
     }
-
 
     if (!password) {
-
         message.textContent =
             "رمز عبور را وارد کنید.";
-
         return;
     }
-
 
     if (
         !window.Bale ||
         !window.Bale.WebApp ||
         typeof window.Bale.WebApp.sendData !== "function"
     ) {
-
         message.textContent =
-            "این صفحه باید از داخل Mini App بله باز شود.";
-
+            "ارتباط با Mini App بله برقرار نیست.";
         return;
     }
-
 
     message.textContent =
         "در حال بررسی اطلاعات...";
 
-
-    const data = {
-        action: "employee_login",
-        rahkaran_party_id: username,
-        password: password
-    };
-
-
     window.Bale.WebApp.sendData(
-        JSON.stringify(data)
+        JSON.stringify({
+            action: "employee_login",
+            rahkaran_party_id: username,
+            password: password
+        })
     );
-
 });
 
 </script>
