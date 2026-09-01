@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://tapi.bale.ai/miniapp.js?3"></script>
+
+    <title>ورود کارکنان آمال</title>
+
+    <style>
+        body {
+            font-family: Tahoma, Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 30px 15px;
+            direction: rtl;
+        }
+
+        .box {
+            max-width: 420px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,.08);
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+        }
+
+        input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px;
+            margin-top: 6px;
+            border: 1px solid #ccc;
+            border-radius: 9px;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 20px;
+            padding: 13px;
+            border: 0;
+            border-radius: 9px;
+            font-size: 16px;
+        }
+
+        #message {
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="box">
+
+    <h2>ورود کارکنان</h2>
+
+    <form id="loginForm">
+
+        <label>نام کاربری</label>
+
+        <input
+            id="username"
+            type="text"
+            inputmode="numeric"
+            placeholder="کد راهکاران"
+            required
+        >
+
+        <label>رمز عبور</label>
+
+        <input
+            id="password"
+            type="password"
+            placeholder="رمز عبور"
+            required
+        >
+
+        <button type="submit">
+            ورود
+        </button>
+
+    </form>
+
+    <div id="message"></div>
+
+</div>
+
+<script>
+if (window.Bale && window.Bale.WebApp) {
+    if (window.Bale.WebApp.ready) {
+        window.Bale.WebApp.ready();
+    }
+
+    if (window.Bale.WebApp.expand) {
+        window.Bale.WebApp.expand();
+    }
+}
+
+document
+    .getElementById("loginForm")
+    .addEventListener("submit", function(event) {
+
+        event.preventDefault();
+
+        document.getElementById("message").textContent =
+            "صفحه ورود آماده است.";
+
+    });
+</script>
+
+</body>
+</html>
