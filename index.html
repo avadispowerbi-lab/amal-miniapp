@@ -118,8 +118,6 @@
         (() => {
             "use strict";
 
-            const API_BASE = "https://d21755a66db54f.lhr.life";
-
             const form = document.getElementById("login-form");
             const usernameInput = document.getElementById("username");
             const passwordInput = document.getElementById("password");
@@ -155,7 +153,7 @@
                 loginButton.textContent = "در حال بررسی...";
 
                 try {
-                    const response = await fetch(API_BASE + "/api/login", {
+                    const response = await fetch("/api/login", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
@@ -180,13 +178,16 @@
                         return;
                     }
 
-                    if (!result.token) {
-                        showNotice("نشست ورود از سرور دریافت نشد.");
-                        return;
-                    }
+                    const fullName =
+                        result.employee && result.employee.full_name
+                            ? result.employee.full_name
+                            : "";
 
-                    sessionStorage.setItem("amal_token", result.token);
-                    window.location.href = "./reports.html";
+                    showNotice(
+                        fullName
+                            ? "ورود " + fullName + " با موفقیت انجام شد."
+                            : "ورود با موفقیت انجام شد."
+                    );
 
                 } catch (error) {
                     console.error(error);
@@ -214,3 +215,4 @@
     </script>
 </body>
 </html>
+
