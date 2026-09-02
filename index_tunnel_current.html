@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <script src="https://tapi.bale.ai/miniapp.js?3"></script>
+    <title>مینی اپ آمال</title>
+
+    <style>
+        :root {
+            font-family: Tahoma, Arial, sans-serif;
+            color-scheme: light;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: #f5f6f8;
+            color: #202124;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 620px;
+            background: #fff;
+            border-radius: 18px;
+            padding: 28px 24px;
+            box-shadow: 0 8px 28px rgba(0,0,0,.08);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .title {
+            margin: 0 0 8px;
+            font-size: 25px;
+            text-align: center;
+        }
+
+        .subtitle {
+            margin: 0 0 26px;
+            color: #666;
+            font-size: 14px;
+            line-height: 1.8;
+            text-align: center;
+        }
+
+        .field {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            height: 48px;
+            border: 1px solid #d6d9de;
+            border-radius: 10px;
+            padding: 0 13px;
+            font: inherit;
+            outline: none;
+            background: #fff;
+        }
+
+        input:focus {
+            border-color: #6b7280;
+            box-shadow:
+                0 0 0 3px
+                rgba(107,114,128,.10);
+        }
+
+        .password-wrap {
+            position: relative;
+        }
+
+        .password-wrap input {
+            padding-left: 72px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            left: 8px;
+            top: 7px;
+            height: 34px;
+            border: 0;
+            background: transparent;
+            cursor: pointer;
+            font: inherit;
+            color: #555;
+        }
+
+        .primary-button {
+            width: 100%;
+            min-height: 50px;
+            border: 0;
+            border-radius: 10px;
+            cursor: pointer;
+            font: inherit;
+            font-weight: bold;
+            background: #222;
+            color: #fff;
+        }
+
+        .primary-button:disabled {
+            cursor: wait;
+            opacity: .65;
+        }
+
+        .notice {
+            margin-top: 18px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: #fff7df;
+            color: #6d5200;
+            font-size: 13px;
+            line-height: 1.8;
+            display: none;
+        }
+
+        .success {
+            background: #ecf8ef;
+            color: #176b2c;
+        }
+
+        .bale-status {
+            margin-top: 18px;
+            color: #777;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .menu-grid {
+            display: grid;
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .menu-button {
+            width: 100%;
+            min-height: 56px;
+            border: 0;
+            border-radius: 12px;
+            padding: 14px 16px;
+            background: #f1f3f5;
+            color: #202124;
+            cursor: pointer;
+            font: inherit;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .welcome {
+            margin: 0 0 18px;
+            text-align: center;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .header-row h2 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .small-button {
+            border: 0;
+            border-radius: 9px;
+            padding: 9px 12px;
+            background: #eceff3;
+            color: #222;
+            cursor: pointer;
+            font: inherit;
+        }
+
+        .loading {
+            padding: 22px;
+            text-align: center;
+            color: #666;
+        }
+
+        .table-wrap {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid #e3e6ea;
+            border-radius: 12px;
+        }
+
+        table {
+            width: 100%;
+            min-width: 470px;
+            border-collapse: collapse;
+            background: #fff;
+        }
+
+        th,
+        td {
+            padding: 12px 10px;
+            border-bottom:
+                1px solid #eceff2;
+            text-align: center;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        th {
+            background: #f7f8fa;
+            font-weight: bold;
+        }
+
+        tr:last-child td {
+            border-bottom: 0;
+        }
+
+        .footer {
+            margin-top: 18px;
+            text-align: center;
+        }
+
+        .logout-button {
+            border: 0;
+            background: transparent;
+            color: #777;
+            cursor: pointer;
+            font: inherit;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- صفحه ورود -->
+    <main id="login-view" class="card">
+
+        <h1 class="title">
+            مینی اپ آمال
+        </h1>
+
+        <p class="subtitle">
+            برای مشاهده گزارش‌ها وارد شوید.
+        </p>
+
+        <form
+            id="login-form"
+            autocomplete="off"
+        >
+
+            <div class="field">
+                <label for="username">
+                    نام کاربری
+                </label>
+
+                <input
+                    id="username"
+                    name="username"
+                    type="text"
+                    inputmode="numeric"
+                    autocomplete="username"
+                    required
+                    maxlength="19"
+                    placeholder="نام کاربری"
+                >
+            </div>
+
+            <div class="field">
+                <label for="password">
+                    رمز عبور
+                </label>
+
+                <div class="password-wrap">
+
+                    <input
+                        id="password"
+                        name="password"
+                        type="password"
+                        autocomplete="current-password"
+                        required
+                        maxlength="20"
+                        placeholder="رمز عبور"
+                    >
+
+                    <button
+                        id="toggle-password"
+                        class="toggle-password"
+                        type="button"
+                    >
+                        نمایش
+                    </button>
+
+                </div>
+            </div>
+
+            <button
+                id="login-button"
+                class="primary-button"
+                type="submit"
+            >
+                ورود
+            </button>
+
+        </form>
+
+        <div
+            id="login-notice"
+            class="notice"
+            role="status"
+            aria-live="polite"
+        ></div>
+
+        <div
+            id="bale-status"
+            class="bale-status"
+        >
+            در حال آماده‌سازی مینی اپ...
+        </div>
+
+    </main>
+
+
+    <!-- صفحه منوی گزارش‌ها -->
+    <main
+        id="menu-view"
+        class="card hidden"
+    >
+
+        <h1 class="title">
+            گزارش‌های مالی
+        </h1>
+
+        <p
+            id="welcome-text"
+            class="welcome"
+        ></p>
+
+        <p class="subtitle">
+            گزارش موردنظر را انتخاب کنید.
+        </p>
+
+        <div class="menu-grid">
+
+            <button
+                id="sales-summary-button"
+                class="menu-button"
+                type="button"
+            >
+                📊 سرجمع فروش
+            </button>
+
+        </div>
+
+        <div class="footer">
+            <button
+                id="logout-button"
+                class="logout-button"
+                type="button"
+            >
+                خروج از حساب
+            </button>
+        </div>
+
+    </main>
+
+
+    <!-- صفحه گزارش سرجمع فروش -->
+    <main
+        id="report-view"
+        class="card hidden"
+    >
+
+        <div class="header-row">
+
+            <h2>
+                سرجمع فروش
+            </h2>
+
+            <button
+                id="back-button"
+                class="small-button"
+                type="button"
+            >
+                بازگشت
+            </button>
+
+        </div>
+
+        <div
+            id="report-notice"
+            class="notice"
+            role="status"
+            aria-live="polite"
+        ></div>
+
+        <div
+            id="report-loading"
+            class="loading hidden"
+        >
+            در حال دریافت گزارش...
+        </div>
+
+        <div
+            id="table-wrap"
+            class="table-wrap hidden"
+        >
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>
+                            نوع فاکتور
+                        </th>
+
+                        <th>
+                            فروشگاه / مرکز فروش
+                        </th>
+
+                        <th>
+                            جمع
+                        </th>
+                    </tr>
+                </thead>
+
+                <tbody
+                    id="sales-table-body"
+                ></tbody>
+
+            </table>
+
+        </div>
+
+    </main>
+
+
+    <script>
+        (() => {
+
+            "use strict";
+
+            /*
+              URL اصلی Mini App همان GitHub است.
+              این آدرس فقط Backend Python است.
+              در نسخه دائمی فقط همین مقدار با
+              https://4c8a39c8dee1f0.lhr.life
+              جایگزین می‌شود.
+            */
+            const API_BASE =
+                "https://4c8a39c8dee1f0.lhr.life";
+
+
+            const loginView =
+                document.getElementById(
+                    "login-view"
+                );
+
+            const menuView =
+                document.getElementById(
+                    "menu-view"
+                );
+
+            const reportView =
+                document.getElementById(
+                    "report-view"
+                );
+
+            const form =
+                document.getElementById(
+                    "login-form"
+                );
+
+            const usernameInput =
+                document.getElementById(
+                    "username"
+                );
+
+            const passwordInput =
+                document.getElementById(
+                    "password"
+                );
+
+            const togglePassword =
+                document.getElementById(
+                    "toggle-password"
+                );
+
+            const loginButton =
+                document.getElementById(
+                    "login-button"
+                );
+
+            const loginNotice =
+                document.getElementById(
+                    "login-notice"
+                );
+
+            const baleStatus =
+                document.getElementById(
+                    "bale-status"
+                );
+
+            const welcomeText =
+                document.getElementById(
+                    "welcome-text"
+                );
+
+            const salesSummaryButton =
+                document.getElementById(
+                    "sales-summary-button"
+                );
+
+            const logoutButton =
+                document.getElementById(
+                    "logout-button"
+                );
+
+            const backButton =
+                document.getElementById(
+                    "back-button"
+                );
+
+            const reportNotice =
+                document.getElementById(
+                    "report-notice"
+                );
+
+            const reportLoading =
+                document.getElementById(
+                    "report-loading"
+                );
+
+            const tableWrap =
+                document.getElementById(
+                    "table-wrap"
+                );
+
+            const salesTableBody =
+                document.getElementById(
+                    "sales-table-body"
+                );
+
+
+            let sessionToken = null;
+
+
+            function showView(view) {
+
+                loginView.classList.add(
+                    "hidden"
+                );
+
+                menuView.classList.add(
+                    "hidden"
+                );
+
+                reportView.classList.add(
+                    "hidden"
+                );
+
+                view.classList.remove(
+                    "hidden"
+                );
+            }
+
+
+            function showNotice(
+                element,
+                message,
+                success = false
+            ) {
+
+                element.textContent =
+                    message;
+
+                element.classList.toggle(
+                    "success",
+                    success
+                );
+
+                element.style.display =
+                    "block";
+            }
+
+
+            function hideNotice(element) {
+
+                element.style.display =
+                    "none";
+
+                element.textContent = "";
+
+                element.classList.remove(
+                    "success"
+                );
+            }
+
+
+            function getBaleInitData() {
+
+                if (
+                    !window.Bale ||
+                    !window.Bale.WebApp
+                ) {
+                    return "";
+                }
+
+                return (
+                    window.Bale.WebApp.initData
+                    || ""
+                );
+            }
+
+
+            function formatNumber(value) {
+
+                const number =
+                    Number(value);
+
+                if (
+                    !Number.isFinite(number)
+                ) {
+                    return String(
+                        value ?? ""
+                    );
+                }
+
+                return new Intl.NumberFormat(
+                    "fa-IR",
+                    {
+                        maximumFractionDigits: 6
+                    }
+                ).format(number);
+            }
+
+
+            togglePassword.addEventListener(
+                "click",
+                () => {
+
+                    const isPassword =
+                        passwordInput.type
+                        === "password";
+
+                    passwordInput.type =
+                        isPassword
+                        ? "text"
+                        : "password";
+
+                    togglePassword.textContent =
+                        isPassword
+                        ? "مخفی"
+                        : "نمایش";
+                }
+            );
+
+
+            form.addEventListener(
+                "submit",
+                async (event) => {
+
+                    event.preventDefault();
+
+                    const username =
+                        usernameInput.value.trim();
+
+                    const password =
+                        passwordInput.value.trim();
+
+                    if (
+                        !/^\d{1,19}$/.test(
+                            username
+                        )
+                    ) {
+
+                        showNotice(
+                            loginNotice,
+                            "نام کاربری باید کد عددی راهکاران باشد."
+                        );
+
+                        return;
+                    }
+
+                    if (!password) {
+
+                        showNotice(
+                            loginNotice,
+                            "رمز عبور را وارد کنید."
+                        );
+
+                        return;
+                    }
+
+                    const initData =
+                        getBaleInitData();
+
+                    if (!initData) {
+
+                        showNotice(
+                            loginNotice,
+                            "اطلاعات هویتی بله دریافت نشد. مینی اپ را از داخل بله باز کنید."
+                        );
+
+                        return;
+                    }
+
+                    hideNotice(
+                        loginNotice
+                    );
+
+                    loginButton.disabled =
+                        true;
+
+                    loginButton.textContent =
+                        "در حال بررسی...";
+
+                    try {
+
+                        const response =
+                            await fetch(
+                                API_BASE
+                                + "/api/login",
+                                {
+                                    method:
+                                        "POST",
+
+                                    headers: {
+                                        "Content-Type":
+                                            "application/json",
+
+                                        "X-Bale-Init-Data":
+                                            initData
+                                    },
+
+                                    body:
+                                        JSON.stringify({
+                                            username:
+                                                username,
+                                            password:
+                                                password
+                                        })
+                                }
+                            );
+
+                        let result;
+
+                        try {
+
+                            result =
+                                await response.json();
+
+                        }
+                        catch {
+
+                            showNotice(
+                                loginNotice,
+                                "پاسخ سرور قابل پردازش نیست."
+                            );
+
+                            return;
+                        }
+
+                        if (
+                            !response.ok
+                            || result.success
+                                !== true
+                            || !result.token
+                        ) {
+
+                            showNotice(
+                                loginNotice,
+                                result.message
+                                || "نام کاربری یا رمز عبور صحیح نیست."
+                            );
+
+                            return;
+                        }
+
+                        sessionToken =
+                            result.token;
+
+                        passwordInput.value =
+                            "";
+
+                        const fullName =
+                            result.employee
+                            && result.employee
+                                .full_name
+                            ? result.employee
+                                .full_name
+                            : "";
+
+                        welcomeText.textContent =
+                            fullName
+                            ? "خوش آمدید "
+                                + fullName
+                            : "ورود با موفقیت انجام شد.";
+
+                        showView(menuView);
+
+                    }
+                    catch (error) {
+
+                        console.error(
+                            error
+                        );
+
+                        showNotice(
+                            loginNotice,
+                            "ارتباط با سرور ورود برقرار نشد."
+                        );
+                    }
+                    finally {
+
+                        loginButton.disabled =
+                            false;
+
+                        loginButton.textContent =
+                            "ورود";
+                    }
+                }
+            );
+
+
+            salesSummaryButton.addEventListener(
+                "click",
+                async () => {
+
+                    if (!sessionToken) {
+
+                        showView(
+                            loginView
+                        );
+
+                        showNotice(
+                            loginNotice,
+                            "نشست ورود معتبر نیست. دوباره وارد شوید."
+                        );
+
+                        return;
+                    }
+
+                    showView(
+                        reportView
+                    );
+
+                    hideNotice(
+                        reportNotice
+                    );
+
+                    tableWrap.classList.add(
+                        "hidden"
+                    );
+
+                    reportLoading.classList.remove(
+                        "hidden"
+                    );
+
+                    salesTableBody.innerHTML =
+                        "";
+
+                    try {
+
+                        const response =
+                            await fetch(
+                                API_BASE
+                                + "/api/reports/sales-summary",
+                                {
+                                    method:
+                                        "GET",
+
+                                    headers: {
+                                        "Authorization":
+                                            "Bearer "
+                                            + sessionToken
+                                    }
+                                }
+                            );
+
+                        let result;
+
+                        try {
+
+                            result =
+                                await response.json();
+
+                        }
+                        catch {
+
+                            showNotice(
+                                reportNotice,
+                                "پاسخ گزارش قابل پردازش نیست."
+                            );
+
+                            return;
+                        }
+
+                        if (
+                            response.status
+                            === 401
+                        ) {
+
+                            sessionToken =
+                                null;
+
+                            showView(
+                                loginView
+                            );
+
+                            showNotice(
+                                loginNotice,
+                                "نشست شما منقضی شده است. دوباره وارد شوید."
+                            );
+
+                            return;
+                        }
+
+                        if (
+                            !response.ok
+                            || result.ok
+                                !== true
+                            || !Array.isArray(
+                                result.rows
+                            )
+                        ) {
+
+                            showNotice(
+                                reportNotice,
+                                "دریافت گزارش با خطا مواجه شد."
+                            );
+
+                            return;
+                        }
+
+                        if (
+                            result.rows.length
+                            === 0
+                        ) {
+
+                            showNotice(
+                                reportNotice,
+                                "برای این گزارش داده‌ای یافت نشد."
+                            );
+
+                            return;
+                        }
+
+                        for (
+                            const row
+                            of result.rows
+                        ) {
+
+                            const tr =
+                                document.createElement(
+                                    "tr"
+                                );
+
+                            const invoiceType =
+                                document.createElement(
+                                    "td"
+                                );
+
+                            invoiceType.textContent =
+                                row.invoice_type
+                                ?? "";
+
+                            const salesOffice =
+                                document.createElement(
+                                    "td"
+                                );
+
+                            salesOffice.textContent =
+                                row.sales_office
+                                ?? "";
+
+                            const total =
+                                document.createElement(
+                                    "td"
+                                );
+
+                            total.textContent =
+                                formatNumber(
+                                    row.total
+                                );
+
+                            tr.append(
+                                invoiceType,
+                                salesOffice,
+                                total
+                            );
+
+                            salesTableBody
+                                .appendChild(tr);
+                        }
+
+                        tableWrap
+                            .classList
+                            .remove(
+                                "hidden"
+                            );
+
+                    }
+                    catch (error) {
+
+                        console.error(
+                            error
+                        );
+
+                        showNotice(
+                            reportNotice,
+                            "ارتباط با سرور گزارش برقرار نشد."
+                        );
+                    }
+                    finally {
+
+                        reportLoading
+                            .classList
+                            .add(
+                                "hidden"
+                            );
+                    }
+                }
+            );
+
+
+            backButton.addEventListener(
+                "click",
+                () => {
+
+                    showView(
+                        menuView
+                    );
+                }
+            );
+
+
+            logoutButton.addEventListener(
+                "click",
+                () => {
+
+                    sessionToken = null;
+
+                    usernameInput.value =
+                        "";
+
+                    passwordInput.value =
+                        "";
+
+                    showView(
+                        loginView
+                    );
+
+                    showNotice(
+                        loginNotice,
+                        "از حساب خارج شدید.",
+                        true
+                    );
+                }
+            );
+
+
+            if (
+                window.Bale
+                && window.Bale.WebApp
+            ) {
+
+                try {
+
+                    window.Bale.WebApp
+                        .ready();
+
+                    if (
+                        typeof
+                        window.Bale.WebApp
+                            .expand
+                        === "function"
+                    ) {
+
+                        window.Bale.WebApp
+                            .expand();
+                    }
+
+                    baleStatus.textContent =
+                        "مینی اپ بله آماده است.";
+
+                }
+                catch {
+
+                    baleStatus.textContent =
+                        "صفحه آماده است.";
+                }
+            }
+            else {
+
+                baleStatus.textContent =
+                    "صفحه را از داخل بله باز کنید.";
+            }
+
+        })();
+    </script>
+
+</body>
+</html>
