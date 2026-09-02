@@ -2,203 +2,215 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>ورود کارکنان آمال</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <script src="https://tapi.bale.ai/miniapp.js?3"></script>
+    <title>ورود به مینی اپ آمال</title>
     <style>
+        :root { font-family: Tahoma, Arial, sans-serif; color-scheme: light; }
+        * { box-sizing: border-box; }
         body {
-            font-family: Tahoma, Arial, sans-serif;
-            background: #f5f5f5;
             margin: 0;
-            padding: 30px 15px;
-            direction: rtl;
+            min-height: 100vh;
+            background: #f5f6f8;
+            color: #202124;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
-
-        .box {
+        .login-card {
+            width: 100%;
             max-width: 420px;
-            margin: 20px auto;
-            background: white;
-            padding: 25px;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0,0,0,.08);
+            background: #fff;
+            border-radius: 18px;
+            padding: 28px 24px;
+            box-shadow: 0 8px 28px rgba(0,0,0,.08);
         }
-
-        h2 {
-            text-align: center;
-        }
-
-        label {
-            display: block;
-            margin-top: 15px;
-        }
-
+        .title { margin: 0 0 8px; font-size: 25px; text-align: center; }
+        .subtitle { margin: 0 0 26px; color: #666; font-size: 14px; line-height: 1.8; text-align: center; }
+        .field { margin-bottom: 18px; }
+        label { display: block; font-size: 14px; margin-bottom: 8px; font-weight: bold; }
         input {
             width: 100%;
-            box-sizing: border-box;
-            padding: 12px;
-            margin-top: 6px;
-            border: 1px solid #ccc;
-            border-radius: 9px;
-            font-size: 16px;
+            height: 48px;
+            border: 1px solid #d6d9de;
+            border-radius: 10px;
+            padding: 0 13px;
+            font: inherit;
+            outline: none;
+            background: #fff;
         }
-
-        button {
-            width: 100%;
-            margin-top: 20px;
-            padding: 13px;
+        input:focus { border-color: #6b7280; box-shadow: 0 0 0 3px rgba(107,114,128,.10); }
+        .password-wrap { position: relative; }
+        .password-wrap input { padding-left: 72px; }
+        .toggle-password {
+            position: absolute;
+            left: 8px;
+            top: 7px;
+            height: 34px;
             border: 0;
-            border-radius: 9px;
-            font-size: 16px;
+            background: transparent;
+            cursor: pointer;
+            font: inherit;
+            color: #555;
         }
-
-        #message,
-        #status {
-            margin-top: 15px;
-            text-align: center;
+        .login-button {
+            width: 100%;
+            height: 50px;
+            border: 0;
+            border-radius: 10px;
+            cursor: pointer;
+            font: inherit;
+            font-weight: bold;
+            background: #222;
+            color: #fff;
+            margin-top: 4px;
+        }
+        .login-button:disabled {
+            cursor: wait;
+            opacity: .65;
+        }
+        .notice {
+            margin-top: 18px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: #fff7df;
+            color: #6d5200;
+            font-size: 13px;
             line-height: 1.8;
+            display: none;
         }
+        .bale-status { margin-top: 18px; color: #777; font-size: 12px; text-align: center; }
+        .hint { margin-top: 7px; color: #777; font-size: 12px; line-height: 1.7; }
     </style>
 </head>
-
 <body>
+    <main class="login-card" data-app-version="login-api-v1">
+        <h1 class="title">مینی اپ آمال</h1>
+        <p class="subtitle">برای مشاهده گزارش‌های مجاز، وارد حساب کاربری خود شوید.</p>
 
-<div class="box">
+        <form id="login-form" autocomplete="off">
+            <div class="field">
+                <label for="username">نام کاربری / کد پرسنلی</label>
+                <input id="username" name="username" type="text" autocomplete="username"
+                       required maxlength="50" placeholder="کد پرسنلی">
+                <div class="hint">برای کاربران سازمانی، نام کاربری همان کد پرسنلی است.</div>
+            </div>
 
-    <h2>ورود کارکنان</h2>
+            <div class="field">
+                <label for="password">کد امنیتی</label>
+                <div class="password-wrap">
+                    <input id="password" name="password" type="password"
+                           autocomplete="current-password" required maxlength="20"
+                           placeholder="کد امنیتی">
+                    <button id="toggle-password" class="toggle-password" type="button">نمایش</button>
+                </div>
+            </div>
 
-    <div id="status">
-        در حال اتصال به بله...
-    </div>
+            <button class="login-button" type="submit">ورود</button>
+        </form>
 
-    <form id="loginForm">
+        <div id="notice" class="notice" role="status" aria-live="polite"></div>
+        <div id="bale-status" class="bale-status">در حال آماده‌سازی مینی اپ...</div>
+    </main>
 
-        <label for="username">کد راهکاران</label>
+    <script>
+        (() => {
+            "use strict";
 
-        <input
-            id="username"
-            type="text"
-            inputmode="numeric"
-            placeholder="کد راهکاران"
-            required
-        >
+            const API_BASE = "https://d21755a66db54f.lhr.life";
 
-        <label for="password">رمز عبور</label>
+            const form = document.getElementById("login-form");
+            const usernameInput = document.getElementById("username");
+            const passwordInput = document.getElementById("password");
+            const togglePassword = document.getElementById("toggle-password");
+            const notice = document.getElementById("notice");
+            const baleStatus = document.getElementById("bale-status");
+            const loginButton = form.querySelector(".login-button");
 
-        <input
-            id="password"
-            type="password"
-            placeholder="رمز عبور"
-            required
-        >
+            function showNotice(message) {
+                notice.textContent = message;
+                notice.style.display = "block";
+            }
 
-        <button type="submit">
-            ورود
-        </button>
+            togglePassword.addEventListener("click", () => {
+                const isPassword = passwordInput.type === "password";
+                passwordInput.type = isPassword ? "text" : "password";
+                togglePassword.textContent = isPassword ? "مخفی" : "نمایش";
+            });
 
-    </form>
+            form.addEventListener("submit", async (event) => {
+                event.preventDefault();
 
-    <div id="message"></div>
+                const personnelCode = usernameInput.value.trim();
+                const securityCode = passwordInput.value.trim();
 
-</div>
+                if (!personnelCode || !securityCode) {
+                    showNotice("کد پرسنلی و کد امنیتی را کامل وارد کنید.");
+                    return;
+                }
 
+                notice.style.display = "none";
+                loginButton.disabled = true;
+                loginButton.textContent = "در حال بررسی...";
 
-<script>
+                try {
+                    const response = await fetch(API_BASE + "/api/login", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            personnel_code: personnelCode,
+                            security_code: securityCode
+                        })
+                    });
 
-const form = document.getElementById("loginForm");
-const message = document.getElementById("message");
-const statusElement = document.getElementById("status");
+                    let result;
 
+                    try {
+                        result = await response.json();
+                    } catch (error) {
+                        showNotice("پاسخ سرور قابل پردازش نیست.");
+                        return;
+                    }
 
-function initializeBale() {
+                    if (!response.ok || result.success !== true) {
+                        showNotice(result.message || "اطلاعات ورود صحیح نیست.");
+                        return;
+                    }
 
-    if (
-        window.Bale &&
-        window.Bale.WebApp
-    ) {
+                    if (!result.token) {
+                        showNotice("نشست ورود از سرور دریافت نشد.");
+                        return;
+                    }
 
-        statusElement.textContent =
-            "ارتباط با بله برقرار شد.";
+                    sessionStorage.setItem("amal_token", result.token);
+                    window.location.href = "./reports.html";
 
-        if (window.Bale.WebApp.ready) {
-            window.Bale.WebApp.ready();
-        }
+                } catch (error) {
+                    console.error(error);
+                    showNotice("ارتباط با سرور ورود برقرار نشد.");
+                } finally {
+                    loginButton.disabled = false;
+                    loginButton.textContent = "ورود";
+                }
+            });
 
-        if (window.Bale.WebApp.expand) {
-            window.Bale.WebApp.expand();
-        }
-
-    } else {
-
-        statusElement.textContent =
-            "این صفحه باید از داخل Mini App بله باز شود.";
-    }
-}
-
-
-const baleScript = document.createElement("script");
-
-baleScript.src =
-    "https://tapi.bale.ai/miniapp.js?3";
-
-baleScript.onload = initializeBale;
-
-baleScript.onerror = function () {
-    statusElement.textContent =
-        "ارتباط با سرویس Mini App بله برقرار نشد.";
-};
-
-document.head.appendChild(baleScript);
-
-
-form.addEventListener("submit", function(event) {
-
-    event.preventDefault();
-
-    const username =
-        document.getElementById("username")
-            .value
-            .trim();
-
-    const password =
-        document.getElementById("password")
-            .value;
-
-    if (!/^[0-9]+$/.test(username)) {
-        message.textContent =
-            "کد راهکاران معتبر نیست.";
-        return;
-    }
-
-    if (!password) {
-        message.textContent =
-            "رمز عبور را وارد کنید.";
-        return;
-    }
-
-    if (
-        !window.Bale ||
-        !window.Bale.WebApp ||
-        typeof window.Bale.WebApp.sendData !== "function"
-    ) {
-        message.textContent =
-            "ارتباط با Mini App بله برقرار نیست.";
-        return;
-    }
-
-    message.textContent =
-        "در حال بررسی اطلاعات...";
-
-    window.Bale.WebApp.sendData(
-        JSON.stringify({
-            action: "employee_login",
-            rahkaran_party_id: username,
-            password: password
-        })
-    );
-});
-
-</script>
-
+            if (window.Bale && window.Bale.WebApp) {
+                try {
+                    window.Bale.WebApp.ready();
+                    if (typeof window.Bale.WebApp.expand === "function") {
+                        window.Bale.WebApp.expand();
+                    }
+                    baleStatus.textContent = "مینی اپ بله آماده است.";
+                } catch (error) {
+                    baleStatus.textContent = "صفحه آماده است.";
+                }
+            } else {
+                baleStatus.textContent = "صفحه خارج از محیط مینی اپ بله باز شده است.";
+            }
+        })();
+    </script>
 </body>
 </html>

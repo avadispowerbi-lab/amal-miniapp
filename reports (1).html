@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <script src="https://tapi.bale.ai/miniapp.js?3"></script>
+    <title>گزارش‌های مالی آمال</title>
+
+    <style>
+        :root {
+            font-family: Tahoma, Arial, sans-serif;
+            color-scheme: light;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: #f5f6f8;
+            color: #202124;
+            padding: 18px;
+        }
+
+        .app {
+            width: 100%;
+            max-width: 760px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 18px;
+            padding: 22px 18px;
+            box-shadow: 0 8px 28px rgba(0,0,0,.08);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .title {
+            margin: 0 0 8px;
+            font-size: 24px;
+            text-align: center;
+        }
+
+        .subtitle {
+            margin: 0 0 22px;
+            color: #666;
+            font-size: 14px;
+            line-height: 1.8;
+            text-align: center;
+        }
+
+        .menu-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .menu-button {
+            width: 100%;
+            min-height: 56px;
+            border: 0;
+            border-radius: 12px;
+            padding: 14px 16px;
+            background: #f1f3f5;
+            color: #202124;
+            cursor: pointer;
+            font: inherit;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .menu-button:disabled {
+            opacity: .65;
+            cursor: wait;
+        }
+
+        .header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .header-row h2 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .small-button {
+            border: 0;
+            border-radius: 9px;
+            padding: 9px 12px;
+            background: #eceff3;
+            color: #222;
+            cursor: pointer;
+            font: inherit;
+        }
+
+        .notice {
+            margin: 14px 0;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: #fff7df;
+            color: #6d5200;
+            font-size: 13px;
+            line-height: 1.8;
+            display: none;
+        }
+
+        .loading {
+            padding: 22px;
+            text-align: center;
+            color: #666;
+        }
+
+        .table-wrap {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid #e3e6ea;
+            border-radius: 12px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 470px;
+            background: #fff;
+        }
+
+        th,
+        td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #eceff2;
+            text-align: center;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        th {
+            background: #f7f8fa;
+            font-weight: bold;
+        }
+
+        tr:last-child td {
+            border-bottom: 0;
+        }
+
+        .footer {
+            margin-top: 18px;
+            text-align: center;
+        }
+
+        .logout-button {
+            border: 0;
+            background: transparent;
+            color: #777;
+            cursor: pointer;
+            font: inherit;
+        }
+
+        .bale-status {
+            margin-top: 16px;
+            color: #777;
+            font-size: 12px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+<div class="app">
+
+    <!-- منوی گزارش‌ها -->
+    <section id="menu-view" class="card">
+        <h1 class="title">گزارش‌های مالی</h1>
+        <p class="subtitle">گزارش موردنظر را انتخاب کنید.</p>
+
+        <div class="menu-grid">
+            <button
+                id="sales-summary-button"
+                class="menu-button"
+                type="button"
+            >
+                📊 سرجمع فروش
+            </button>
+        </div>
+
+        <div class="footer">
+            <button
+                id="logout-button"
+                class="logout-button"
+                type="button"
+            >
+                خروج از حساب
+            </button>
+        </div>
+
+        <div id="bale-status" class="bale-status"></div>
+    </section>
+
+    <!-- گزارش سرجمع فروش -->
+    <section id="report-view" class="card hidden">
+
+        <div class="header-row">
+            <h2>سرجمع فروش</h2>
+
+            <button
+                id="back-button"
+                class="small-button"
+                type="button"
+            >
+                بازگشت
+            </button>
+        </div>
+
+        <div
+            id="report-message"
+            class="notice"
+            role="status"
+            aria-live="polite"
+        ></div>
+
+        <div id="report-loading" class="loading hidden">
+            در حال دریافت گزارش...
+        </div>
+
+        <div id="table-wrap" class="table-wrap hidden">
+            <table>
+                <thead>
+                    <tr>
+                        <th>نوع فاکتور</th>
+                        <th>فروشگاه / مرکز فروش</th>
+                        <th>جمع</th>
+                    </tr>
+                </thead>
+
+                <tbody id="sales-table-body"></tbody>
+            </table>
+        </div>
+    </section>
+
+</div>
+
+<script>
+(() => {
+    "use strict";
+
+    /*
+      URL اصلی Mini App تغییر نمی‌کند.
+      این فقط آدرس Backend گزارش‌هاست.
+    */
+    const API_BASE = "https://d21755a66db54f.lhr.life";
+
+    const token = sessionStorage.getItem("amal_token");
+
+    if (!token) {
+        window.location.replace("./");
+        return;
+    }
+
+    const menuView =
+        document.getElementById("menu-view");
+
+    const reportView =
+        document.getElementById("report-view");
+
+    const salesSummaryButton =
+        document.getElementById(
+            "sales-summary-button"
+        );
+
+    const backButton =
+        document.getElementById("back-button");
+
+    const logoutButton =
+        document.getElementById("logout-button");
+
+    const reportMessage =
+        document.getElementById("report-message");
+
+    const reportLoading =
+        document.getElementById("report-loading");
+
+    const tableWrap =
+        document.getElementById("table-wrap");
+
+    const salesTableBody =
+        document.getElementById(
+            "sales-table-body"
+        );
+
+    const baleStatus =
+        document.getElementById("bale-status");
+
+
+    function showMenu() {
+        reportView.classList.add("hidden");
+        menuView.classList.remove("hidden");
+    }
+
+
+    function showReport() {
+        menuView.classList.add("hidden");
+        reportView.classList.remove("hidden");
+    }
+
+
+    function showMessage(message) {
+        reportMessage.textContent = message;
+        reportMessage.style.display = "block";
+    }
+
+
+    function hideMessage() {
+        reportMessage.style.display = "none";
+        reportMessage.textContent = "";
+    }
+
+
+    function formatNumber(value) {
+
+        const number = Number(value);
+
+        if (!Number.isFinite(number)) {
+            return String(value ?? "");
+        }
+
+        return new Intl.NumberFormat(
+            "fa-IR",
+            {
+                maximumFractionDigits: 6
+            }
+        ).format(number);
+    }
+
+
+    async function loadSalesSummary() {
+
+        hideMessage();
+
+        tableWrap.classList.add("hidden");
+
+        reportLoading.classList.remove("hidden");
+
+        salesTableBody.innerHTML = "";
+
+        salesSummaryButton.disabled = true;
+
+        try {
+
+            const response = await fetch(
+                API_BASE +
+                "/api/reports/sales-summary",
+                {
+                    method: "GET",
+
+                    headers: {
+                        "Authorization":
+                            "Bearer " + token
+                    }
+                }
+            );
+
+            let result;
+
+            try {
+                result = await response.json();
+            }
+            catch {
+                showMessage(
+                    "پاسخ سرور گزارش قابل پردازش نیست."
+                );
+                return;
+            }
+
+            if (response.status === 401) {
+
+                sessionStorage.removeItem(
+                    "amal_token"
+                );
+
+                window.location.replace("./");
+
+                return;
+            }
+
+            if (
+                !response.ok ||
+                result.ok !== true ||
+                !Array.isArray(result.rows)
+            ) {
+                showMessage(
+                    "دریافت گزارش با خطا مواجه شد."
+                );
+                return;
+            }
+
+            if (result.rows.length === 0) {
+                showMessage(
+                    "برای این گزارش داده‌ای یافت نشد."
+                );
+                return;
+            }
+
+            for (const row of result.rows) {
+
+                const tr =
+                    document.createElement("tr");
+
+                const invoiceType =
+                    document.createElement("td");
+
+                invoiceType.textContent =
+                    row.invoice_type ?? "";
+
+                const salesOffice =
+                    document.createElement("td");
+
+                salesOffice.textContent =
+                    row.sales_office ?? "";
+
+                const total =
+                    document.createElement("td");
+
+                total.textContent =
+                    formatNumber(row.total);
+
+                tr.append(
+                    invoiceType,
+                    salesOffice,
+                    total
+                );
+
+                salesTableBody.appendChild(tr);
+            }
+
+            tableWrap.classList.remove("hidden");
+
+        }
+        catch (error) {
+
+            console.error(error);
+
+            showMessage(
+                "ارتباط امن با سرور گزارش برقرار نشد."
+            );
+
+        }
+        finally {
+
+            reportLoading.classList.add("hidden");
+
+            salesSummaryButton.disabled = false;
+        }
+    }
+
+
+    salesSummaryButton.addEventListener(
+        "click",
+        async () => {
+
+            showReport();
+
+            await loadSalesSummary();
+        }
+    );
+
+
+    backButton.addEventListener(
+        "click",
+        () => {
+            showMenu();
+        }
+    );
+
+
+    logoutButton.addEventListener(
+        "click",
+        () => {
+
+            sessionStorage.removeItem(
+                "amal_token"
+            );
+
+            window.location.replace("./");
+        }
+    );
+
+
+    if (
+        window.Bale &&
+        window.Bale.WebApp
+    ) {
+
+        try {
+
+            window.Bale.WebApp.ready();
+
+            if (
+                typeof
+                window.Bale.WebApp.expand
+                === "function"
+            ) {
+                window.Bale.WebApp.expand();
+            }
+
+            baleStatus.textContent =
+                "مینی اپ بله آماده است.";
+        }
+        catch {
+            baleStatus.textContent =
+                "صفحه آماده است.";
+        }
+    }
+})();
+</script>
+
+</body>
+</html>
